@@ -2,6 +2,7 @@ import requests
 
 from services.base_api import BaseAPI
 from services.restful_booker.auth.models.auth import RequestPostAuth, ResponsePostAuth
+from utils.schema import validate_schema
 
 
 class AuthClient(BaseAPI):
@@ -11,8 +12,16 @@ class AuthClient(BaseAPI):
         validate: bool = True,
     ) -> tuple[requests.Response, ResponsePostAuth | None]:
         if validate:
-            RequestPostAuth.model_validate(data)
+            validate_schema(
+                RequestPostAuth,
+                data,
+                "Валидация тела запроса авторизации по схеме RequestPostAuth",
+            )
         response = self.post("/auth", json=data)
         if not validate:
             return response, None
-        return response, ResponsePostAuth.model_validate(response.json())
+        return response, validate_schema(
+            ResponsePostAuth,
+            response.json(),
+            "Валидация ответа авторизации по схеме ResponsePostAuth",
+        )

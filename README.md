@@ -1,5 +1,7 @@
 # API-тесты Restful Booker
 
+Фреймворк для тестирования REST API [Restful Booker](https://restful-booker.herokuapp.com/): pytest, Pydantic, Faker, Allure, Docker и GitHub Actions.
+
 ## Подготовка
 
 1. Python 3.11+ (локально рекомендуется совпадать с `target-version` в `pyproject.toml` для Ruff).
@@ -37,6 +39,40 @@ pytest --env=stage
 
 Убедитесь, что для stage в `config/environments.py` задан корректный URL, если он отличается от dev.
 
+Маркеры:
+
+```bash
+pytest -m smoke
+pytest -m regression
+```
+
+## Запуск в Docker
+
+Прогон тестов (папка `allure-results` очищается автоматически, результаты монтируются на хост):
+
+```bash
+docker compose run --rm tests
+```
+
+Смена окружения:
+
+```bash
+TEST_ENV=stage docker compose run --rm tests
+```
+
+Просмотр Allure-отчёта локально (нужен [Allure Commandline](https://github.com/allure-framework/allure2/releases) и Java):
+
+```bash
+allure serve allure-results
+```
+
+Либо статический отчёт:
+
+```bash
+allure generate allure-results -o allure-report --clean
+allure open allure-report
+```
+
 ## Параллельный прогон (pytest-xdist)
 
 ```bash
@@ -56,7 +92,7 @@ ruff format --check .
 
 Подробный вывод pytest локально: `pytest -v` (в `pyproject.toml` по умолчанию без `-v`, чтобы не засорять CI).
 
-## Allure
+## Allure (локально без Docker)
 
 После прогона в каталоге `allure-results` появятся сырые данные отчёта (путь задан в `pyproject.toml` через `--alluredir`).
 
@@ -73,6 +109,27 @@ allure serve allure-results
 allure generate allure-results -o allure-report --clean
 allure open allure-report
 ```
+
+В отчёте шаги описаны человекочитаемо: HTTP-запросы, проверки (assert) и валидация ответов по Pydantic-схемам.
+
+## CI/CD (GitHub Actions)
+
+Пайплайн описан в `.github/workflows/api_tests.yml`.
+
+**Когда запускается:** на каждый `pull_request` в ветку `main`.
+
+**Что делает:**
+
+1. Собирает и запускает тесты в Docker (`docker compose run --rm tests`).
+2. Генерирует Allure-отчёт из `allure-results`.
+3. Сохраняет отчёт как artifact `allure-report` (хранение 14 дней).
+
+**Как посмотреть отчёт из CI:**
+
+1. Откройте вкладку Actions у pull request / репозитория.
+2. Выберите успешный (или завершённый) workflow run.
+3. Внизу страницы скачайте artifact `allure-report`.
+4. Распакуйте архив и откройте `index.html` локально (удобнее через `allure open` или любой статический сервер).
 
 ## Поведение pytest из конфига
 

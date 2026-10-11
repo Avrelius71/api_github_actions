@@ -1,0 +1,14 @@
+services:
+  tests:
+    build: .
+    container_name: booker-api-tests
+    environment:
+      TEST_ENV: ${TEST_ENV:-dev}
+      BOOKER_USERNAME: ${BOOKER_USERNAME:-admin}
+      BOOKER_PASSWORD: ${BOOKER_PASSWORD:-password123}
+    volumes:
+      - ./allure-results:/app/allure-results
+    # Чистим старые results, чтобы отчёт не раздувался от прошлых прогонов
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - rm -rf /app/allure-results/* && pytest --env=$${TEST_ENV:-dev}

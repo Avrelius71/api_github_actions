@@ -1,6 +1,0 @@
-services:
-  test:
-    build: .
-    container_name: booker-tests
-    volumes:
-      - ./allure-results:/app/allure-results
