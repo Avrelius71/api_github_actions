@@ -1,0 +1,53 @@
+{
+  "auth": {
+    "expected_error": "Bad credentials",
+    "negative_payloads": [
+      { "username": "", "password": "" },
+      { "username": "admin", "password": "" },
+      { "username": "", "password": "password123" }
+    ]
+  },
+  "booking": {
+    "non_existent_id": 7777,
+    "invalid_token": "12345",
+    "default_checkin": "2018-01-01",
+    "default_checkout": "2019-01-01",
+    "negative_create_payloads": [
+      {
+        "lastname": "b",
+        "totalprice": 100,
+        "depositpaid": true,
+        "bookingdates": { "checkin": "2018-01-01", "checkout": "2019-01-01" },
+        "additionalneeds": "b"
+      },
+      {
+        "firstname": "a",
+        "totalprice": 100,
+        "depositpaid": true,
+        "bookingdates": { "checkin": "2018-01-01", "checkout": "2019-01-01" },
+        "additionalneeds": "b"
+      },
+      {
+        "firstname": "a",
+        "lastname": "b",
+        "depositpaid": true,
+        "bookingdates": { "checkin": "2018-01-01", "checkout": "2019-01-01" },
+        "additionalneeds": "b"
+      },
+      {
+        "firstname": "a",
+        "lastname": "b",
+        "totalprice": 100,
+        "bookingdates": { "checkin": "2018-01-01", "checkout": "2019-01-01" },
+        "additionalneeds": "b"
+      },
+      {
+        "firstname": "a",
+        "lastname": "b",
+        "totalprice": 100,
+        "depositpaid": true,
+        "additionalneeds": "b"
+      }
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+allure-pytest==2.15.3
+allure-python-commons==2.15.3
+Faker==40.15.0
+pydantic==2.13.3
+pydantic_core==2.46.3
+Pygments==2.20.0
+pytest==9.0.3
+pytest-rerunfailures==15.1
+pytest-timeout==2.4.0
+pytest-xdist==3.8.0
+requests==2.33.1
+pydantic-settings==2.14.0
+python-dotenv==1.2.2
+ruff==0.14.4

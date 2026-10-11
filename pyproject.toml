@@ -1,0 +1,29 @@
+[tool.pytest.ini_options]
+addopts = [
+    "--alluredir=allure-results",
+    "--reruns=2",
+    "--reruns-delay=1",
+    "--timeout=60",
+    "--strict-markers",
+    # Итог в конце прогона: упавшие/ошибки и RERUN (тесты, где сработал ретрай)
+    "-rfER",
+]
+log_cli = true
+log_cli_level = "INFO"
+markers = [
+    "smoke: smoke tests",
+    "regression: regression tests",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
