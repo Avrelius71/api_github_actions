@@ -75,7 +75,7 @@ def api(env_config):
 
 
 @pytest.fixture()
-def create_booking_and_filters(api, test_data):
+def create_booking_and_filters(api, test_data, set_token):
     booking_cfg = test_data["booking"]
     data = {
         "firstname": fake.first_name(),
@@ -97,6 +97,10 @@ def create_booking_and_filters(api, test_data):
         "checkin": response.json()["booking"]["bookingdates"]["checkin"],
         "checkout": response.json()["booking"]["bookingdates"]["checkout"],
     }
+    try:
+        api.booking.remove(booking_id, token=set_token)
+    except Exception as exc:
+        warnings.warn(f"Failed to delete booking {booking_id}: {exc}", stacklevel=2)
 
 
 @pytest.fixture()

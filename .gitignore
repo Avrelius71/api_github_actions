@@ -54,7 +54,9 @@ Thumbs.db
 venv/
 .venv/
 allure-results/
+allure-report/
 pycache/
 .pytest_cache/
 .idea
 __pycache__/
+methods/

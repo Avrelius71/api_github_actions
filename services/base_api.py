@@ -99,28 +99,33 @@ class BaseAPI:
         kwargs["headers"] = headers
         kwargs.setdefault("timeout", _DEFAULT_TIMEOUT)
         url = f"{self.base_url}{path}"
-        self._attach_request(request_id=request_id, method=method, url=url, kwargs=kwargs)
-        started_at = time.perf_counter()
-        try:
-            response = self.session.request(method=method.upper(), url=url, **kwargs)
-        except Timeout as exc:
-            raise ApiTimeoutError(f"Timeout for {method.upper()} {url}, request_id={request_id}") from exc
-        except ConnectionError as exc:
-            raise ApiConnectionError(f"Connection error for {method.upper()} {url}, request_id={request_id}") from exc
-        except RequestException as exc:
-            raise ApiError(f"Request failed for {method.upper()} {url}, request_id={request_id}") from exc
+        step_title = f"HTTP {method.upper()} {path}"
+        with allure.step(step_title):
+            self._attach_request(request_id=request_id, method=method, url=url, kwargs=kwargs)
+            started_at = time.perf_counter()
+            try:
+                response = self.session.request(method=method.upper(), url=url, **kwargs)
+            except Timeout as exc:
+                raise ApiTimeoutError(f"Timeout for {method.upper()} {url}, request_id={request_id}") from exc
+            except ConnectionError as exc:
+                raise ApiConnectionError(
+                    f"Connection error for {method.upper()} {url}, request_id={request_id}"
+                ) from exc
+            except RequestException as exc:
+                raise ApiError(f"Request failed for {method.upper()} {url}, request_id={request_id}") from exc
 
-        elapsed_ms = int((time.perf_counter() - started_at) * 1000)
-        self.logger.info(
-            "api_request method=%s url=%s status=%s request_id=%s elapsed_ms=%s",
-            method.upper(),
-            url,
-            response.status_code,
-            request_id,
-            elapsed_ms,
-        )
-        self._attach_response(request_id=request_id, response=response)
-        return response
+            elapsed_ms = int((time.perf_counter() - started_at) * 1000)
+            self.logger.info(
+                "api_request method=%s url=%s status=%s request_id=%s elapsed_ms=%s",
+                method.upper(),
+                url,
+                response.status_code,
+                request_id,
+                elapsed_ms,
+            )
+            self._attach_response(request_id=request_id, response=response)
+            return response
+
 
     def get(self, path: str, **kwargs):
         return self._request("GET", path, **kwargs)
