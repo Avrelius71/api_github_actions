@@ -4,11 +4,17 @@ services:
     container_name: booker-api-tests
     environment:
       TEST_ENV: ${TEST_ENV:-dev}
-      BOOKER_USERNAME: ${BOOKER_USERNAME:-admin}
-      BOOKER_PASSWORD: ${BOOKER_PASSWORD:-password123}
+      BOOKER_USERNAME: ${BOOKER_USERNAME}
+      BOOKER_PASSWORD: ${BOOKER_PASSWORD}
     volumes:
       - ./allure-results:/app/allure-results
-    # Чистим старые results, чтобы отчёт не раздувался от прошлых прогонов
+      - ./allure-report:/app/allure-report
+    # Тесты + Allure-отчёт одной командой; exit code pytest сохраняется
     entrypoint: ["/bin/sh", "-c"]
     command:
-      - rm -rf /app/allure-results/* && pytest --env=$${TEST_ENV:-dev}
+      - >
+        rm -rf /app/allure-results/* /app/allure-report/*
+        && pytest --env=$${TEST_ENV:-dev}
+        ; EXIT=$$?
+        ; allure generate /app/allure-results -o /app/allure-report --clean
+        ; exit $$EXIT
