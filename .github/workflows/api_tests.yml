@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+  push:
 
 jobs:
   api-tests:
@@ -20,28 +21,8 @@ jobs:
         run: docker compose run --rm tests
         env:
           TEST_ENV: dev
-          BOOKER_USERNAME: admin
-          BOOKER_PASSWORD: password123
-
-      - name: Install Java (for Allure CLI)
-        if: always()
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
-
-      - name: Install Allure Commandline
-        if: always()
-        run: |
-          ALLURE_VERSION=2.32.0
-          curl -fsSL "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz" \
-            | sudo tar -xz -C /opt/
-          sudo ln -sf "/opt/allure-${ALLURE_VERSION}/bin/allure" /usr/local/bin/allure
-          allure --version
-
-      - name: Generate Allure report
-        if: always()
-        run: allure generate allure-results -o allure-report --clean
+          BOOKER_USERNAME: ${{ secrets.BOOKER_USERNAME }}
+          BOOKER_PASSWORD: ${{ secrets.BOOKER_PASSWORD }}
 
       - name: Upload Allure report artifact
         if: always()
@@ -50,3 +31,32 @@ jobs:
           name: allure-report
           path: allure-report
           retention-days: 14
+
+  deploy-pages:
+    if: always() && github.ref == 'refs/heads/main'
+    needs: api-tests
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download Allure report
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: allure-report
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
