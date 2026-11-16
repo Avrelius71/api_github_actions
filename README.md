@@ -133,4 +133,4 @@ allure open allure-report
 В `pyproject.toml` заданы: таймаут теста 60 с (`pytest-timeout`), до двух повторов упавших тестов с паузой 1 с (`pytest-rerunfailures`), строгие маркеры, логи в CLI на уровне INFO.
 
 ## Пример отчета:
-![Allure Report Dashboard](images/allure-dashboard.png)
+![Allure Report Dashboard](images/allure-dashboard.png)//
